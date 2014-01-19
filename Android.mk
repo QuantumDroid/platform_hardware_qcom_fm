@@ -14,11 +14,26 @@ LOCAL_JNI_SHARED_LIBRARIES := libqcomfm_jni
 
 LOCAL_MODULE:= qcom.fmradio
 
+LOCAL_ADDITIONAL_DEPENDENCIES := qcom.fmradio.xml
+
 include $(BUILD_JAVA_LIBRARY)
 
 ifeq ($(BOARD_HAS_QCA_FM_SOC), "cherokee")
 LOCAL_CFLAGS += -DFM_SOC_TYPE_CHEROKEE
 endif
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := qcom.fmradio.xml
+LOCAL_SRC_FILES := qcom/fmradio/$(LOCAL_MODULE)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE_PATH := $(TARGET_OUT)/etc/permissions
+
+include $(BUILD_PREBUILT)
+
+
+>>>>>>> 36ed7f8... Allow library to be used by apps directly
 include $(LOCAL_PATH)/jni/Android.mk
 LOCAL_PATH := $(LOCAL_DIR_PATH)
 include $(LOCAL_PATH)/fmapp2/Android.mk
