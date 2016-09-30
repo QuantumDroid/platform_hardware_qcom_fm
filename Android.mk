@@ -32,8 +32,6 @@ LOCAL_MODULE_PATH := $(TARGET_OUT)/etc/permissions
 
 include $(BUILD_PREBUILT)
 
-
->>>>>>> 36ed7f8... Allow library to be used by apps directly
 include $(LOCAL_PATH)/jni/Android.mk
 LOCAL_PATH := $(LOCAL_DIR_PATH)
 include $(LOCAL_PATH)/fmapp2/Android.mk
