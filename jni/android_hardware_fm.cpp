@@ -513,7 +513,7 @@ typedef struct {
 typedef struct {
     int (*hal_init)(fm_vendor_callbacks_t *p_cb);
     int (*set_fm_ctrl)(int ioctl, int val);
-    int (*get_fm_ctrl) (int ioctl, int val);
+    int (*get_fm_ctrl) (int ioctl, int *val);
 } fm_interface_t;
 
 fm_interface_t *vendor_interface;
@@ -656,7 +656,13 @@ static jint android_hardware_fmradio_FmReceiverJNI_getFreqNative
     int err;
     long freq;
 #ifdef FM_SOC_TYPE_CHEROKEE
-    err = vendor_interface->get_fm_ctrl(V4L2_CID_PRV_IRIS_FREQ, freq);
+    err = vendor_interface->get_fm_ctrl(V4L2_CID_PRV_IRIS_FREQ, (int *)&freq);
+    if (err == FM_JNI_SUCCESS) {
+        err = freq;
+    } else {
+        err = FM_JNI_FAILURE;
+        ALOGE("%s: get freq failed\n", LOG_TAG);
+    }
 #else
     if (fd >= 0) {
         err = FmIoctlsInterface :: get_cur_freq(fd, freq);
@@ -756,7 +762,7 @@ static jint android_hardware_fmradio_FmReceiverJNI_getControlNative
 
     ALOGE("id(%x)\n", id);
 #ifdef FM_SOC_TYPE_CHEROKEE
-    err = vendor_interface->get_fm_ctrl(id, val);
+    err = vendor_interface->get_fm_ctrl(id, (int *)&val);
     if (err < 0) {
         ALOGE("%s: get control failed, id: %d\n", LOG_TAG, id);
         err = FM_JNI_FAILURE;
@@ -854,7 +860,7 @@ static jint android_hardware_fmradio_FmReceiverJNI_getRSSINative
     long rmssi;
 
 #ifdef FM_SOC_TYPE_CHEROKEE
-    err = vendor_interface->get_fm_ctrl(V4L2_CID_PRV_IRIS_RMSSI, rmssi);
+    err = vendor_interface->get_fm_ctrl(V4L2_CID_PRV_IRIS_RMSSI, (int *)&rmssi);
     if (err < 0) {
         ALOGE("%s: Get Rssi failed", LOG_TAG);
         err = FM_JNI_FAILURE;
@@ -924,7 +930,7 @@ static jint android_hardware_fmradio_FmReceiverJNI_getLowerBandNative
     int err;
     ULINT freq;
 #ifdef FM_SOC_TYPE_CHEROKEE
-    err = vendor_interface->get_fm_ctrl(V4L2_CID_PRV_IRIS_LOWER_BAND, freq);
+    err = vendor_interface->get_fm_ctrl(V4L2_CID_PRV_IRIS_LOWER_BAND, (int *)&freq);
     if (err < 0) {
         ALOGE("%s: get lower band failed\n", LOG_TAG);
         err = FM_JNI_FAILURE;
@@ -958,7 +964,7 @@ static jint android_hardware_fmradio_FmReceiverJNI_getUpperBandNative
     ULINT freq;
 #ifdef FM_SOC_TYPE_CHEROKEE
 
-    err = vendor_interface->get_fm_ctrl(V4L2_CID_PRV_IRIS_UPPER_BAND, freq);
+    err = vendor_interface->get_fm_ctrl(V4L2_CID_PRV_IRIS_UPPER_BAND, (int *)&freq);
     if (err < 0) {
         ALOGE("%s: get upper band failed\n", LOG_TAG);
         err = FM_JNI_FAILURE;
@@ -989,7 +995,7 @@ static jint android_hardware_fmradio_FmReceiverJNI_setMonoStereoNative
 
     int err;
 #ifdef FM_SOC_TYPE_CHEROKEE
-    err = vendor_interface->get_fm_ctrl(V4L2_CID_PRV_IRIS_AUDIO_MODE, val);
+    err = vendor_interface->set_fm_ctrl(V4L2_CID_PRV_IRIS_AUDIO_MODE, val);
     if (err < 0) {
         ALOGE("%s: set audio mode failed\n", LOG_TAG);
         err = FM_JNI_FAILURE;
